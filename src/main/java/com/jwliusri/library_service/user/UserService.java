@@ -2,6 +2,7 @@ package com.jwliusri.library_service.user;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +58,11 @@ public class UserService {
             .orElseThrow();
 
         userRepository.delete(user);
+    }
+
+    public User getAuthUser(Authentication auth) {
+        return userRepository.findByUsername(auth.getName())
+            .orElseThrow();
     }
 
     private UserResponse mapToResponse(User user) {

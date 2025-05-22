@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("api/articles")
 public class ArticleController {
+
 
     private final ArticleService articleService;
 
@@ -36,8 +38,8 @@ public class ArticleController {
     }
 
     @PostMapping
-    public ArticleResponse createArticle(@Valid @RequestBody ArticleRequest request) {
-        return articleService.createArticle(request);
+    public ArticleResponse createArticle(@Valid @RequestBody ArticleRequest request, Authentication auth) {
+        return articleService.createArticle(request, auth);
     }
 
     @PutMapping("/{id}")
@@ -46,8 +48,8 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteArticle(@PathVariable Long Id) {
-        articleService.deleteArticle(Id);
+    public void deleteArticle(@PathVariable Long id) {
+        articleService.deleteArticle(id);
     }
 
 }

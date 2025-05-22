@@ -1,18 +1,22 @@
 package com.jwliusri.library_service.article;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
+import com.jwliusri.library_service.user.UserService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import com.jwliusri.library_service.user.User;
 
 @Service
 public class ArticleService {
 
+    private final UserService userService;
+
     private final ArticleRepository articleRepository;
 
-    ArticleService(ArticleRepository articleRepository) {
+    ArticleService(ArticleRepository articleRepository, UserService userService) {
         this.articleRepository = articleRepository;
+        this.userService = userService;
     }
 
     public List<ArticleResponse> getAllArticles() {
@@ -29,13 +33,14 @@ public class ArticleService {
 
     }
 
-    public ArticleResponse createArticle(ArticleRequest request) {
+    public ArticleResponse createArticle(ArticleRequest request, Authentication auth) {
+        User author = userService.getAuthUser(auth);
+
         Article article = Article.builder()
             .title(request.getTitle())
             .content(request.getContent())
             .isPublic(request.isPublic())
-            // .createdAt(LocalDateTime.now())
-            // .updatedAt(LocalDateTime.now())
+            .author(author)
             .build();
 
         article = articleRepository.save(article);
