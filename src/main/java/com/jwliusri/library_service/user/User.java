@@ -2,6 +2,7 @@ package com.jwliusri.library_service.user;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -37,8 +38,10 @@ public class User {
     @Builder.Default
     private RoleEnum role = RoleEnum.ROLE_VIEWER;
     
+    @ColumnDefault("true")
     @Builder.Default
     private boolean accountNonLocked = true;
+    @ColumnDefault("0")
     @Builder.Default
     private int failedAttempt = 0;
     private LocalDateTime lockTime;

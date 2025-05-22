@@ -15,7 +15,5 @@ public class UserRequest {
     private String email;
 
     private String password;
-
-    @Builder.Default
-    private RoleEnum role = RoleEnum.ROLE_VIEWER;
+    private RoleEnum role;
 }

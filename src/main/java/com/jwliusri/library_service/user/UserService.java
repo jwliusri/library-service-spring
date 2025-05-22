@@ -2,9 +2,11 @@ package com.jwliusri.library_service.user;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService {
@@ -24,7 +26,7 @@ public class UserService {
 
     public UserResponse getUserById(Long Id) {
         User user = userRepository.findById(Id)
-            .orElseThrow();
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return mapToResponse(user);
     }
@@ -43,11 +45,18 @@ public class UserService {
 
     public UserResponse updateUser(Long id, UserRequest request) {
         User user = userRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         user.setFullName(request.getFullName());
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
+
+        if (request.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
+        }
 
         user = userRepository.save(user);
         return mapToResponse(user);
@@ -55,14 +64,14 @@ public class UserService {
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         userRepository.delete(user);
     }
 
     public User getAuthUser(Authentication auth) {
         return userRepository.findByUsername(auth.getName())
-            .orElseThrow();
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     private UserResponse mapToResponse(User user) {

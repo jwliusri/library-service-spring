@@ -1,10 +1,16 @@
 package com.jwliusri.library_service.article;
 
 import java.util.List;
+import java.util.Set;
+
 import com.jwliusri.library_service.user.UserService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.jwliusri.library_service.user.RoleEnum;
 import com.jwliusri.library_service.user.User;
 
 @Service
@@ -23,11 +29,35 @@ public class ArticleService {
         return articleRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
-    public ArticleResponse getArticleById(Long id) {
-        Article article = articleRepository.findById(id)
-            .orElseThrow();
+    public List<ArticleResponse> getAllPublicOrOwnedArticles(User authUser) {
+        return articleRepository.findAllPublicOrAuthored(authUser.getId()).stream().map(this::mapToResponse).toList();
+    }
 
-        // TODO: Check if article is public or user has access
+    public List<ArticleResponse> getAllPublicOrOwnedArticles(Authentication auth) {
+        User authUser = userService.getAuthUser(auth);
+        return getAllPublicOrOwnedArticles(authUser);
+    }
+
+    public List<ArticleResponse> getAllArticlesByUserAccess(Authentication auth) {
+        User authUser = userService.getAuthUser(auth);
+
+        Set<RoleEnum> limitedRoles = Set.of(RoleEnum.ROLE_VIEWER, RoleEnum.ROLE_CONTRIBUTOR); 
+        if (limitedRoles.contains(authUser.getRole())) {
+            return getAllPublicOrOwnedArticles(authUser);
+        }
+
+        return getAllArticles();
+    }
+
+    public ArticleResponse getArticleById(Long id, Authentication auth) {
+        User authUser = userService.getAuthUser(auth);
+        Article article = articleRepository.findById(id)
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found"));
+
+        Set<RoleEnum> limitedRoles = Set.of(RoleEnum.ROLE_VIEWER, RoleEnum.ROLE_CONTRIBUTOR); 
+        if (limitedRoles.contains(authUser.getRole()) && !article.isPublic()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to view this article");
+        }
 
         return mapToResponse(article);
 
@@ -47,11 +77,15 @@ public class ArticleService {
         return mapToResponse(article);
     }
 
-    public ArticleResponse updateArticle(Long id, ArticleRequest request) {
+    public ArticleResponse updateArticle(Long id, ArticleRequest request, Authentication auth) {
+        User authUser = userService.getAuthUser(auth);
         Article article = articleRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found"));
 
-        // TODO: Check if user has access
+        Set<RoleEnum> limitedRoles = Set.of(RoleEnum.ROLE_EDITOR, RoleEnum.ROLE_CONTRIBUTOR); 
+        if (limitedRoles.contains(authUser.getRole()) && !article.getAuthor().equals(authUser)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to edit this article");
+        }
 
         article.setTitle(request.getTitle());
         article.setContent(request.getContent());
@@ -61,11 +95,16 @@ public class ArticleService {
         return mapToResponse(article);
     }
 
-    public void deleteArticle(Long id) {
+    public void deleteArticle(Long id, Authentication auth) {
+        User authUser = userService.getAuthUser(auth);
         Article article = articleRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found"));
 
         // TODO: Check if user has access
+        Set<RoleEnum> limitedRoles = Set.of(RoleEnum.ROLE_EDITOR); 
+        if (limitedRoles.contains(authUser.getRole()) && !article.getAuthor().equals(authUser)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to delete this article");
+        }
 
         articleRepository.delete(article);
     }

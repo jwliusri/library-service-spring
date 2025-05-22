@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.jwliusri.library_service.user.UserRequest;
-import com.jwliusri.library_service.user.UserResponse;
 import com.jwliusri.library_service.user.UserService;
 import jakarta.validation.Valid;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -70,10 +70,8 @@ public class AuthController {
     }
 
     @GetMapping("me")
+    @PreAuthorize("isAuthenticated()")
     public String getMe(Authentication auth) {
-        if (auth == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-        }
         return auth.getName();
     }
     
