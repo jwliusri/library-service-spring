@@ -2,15 +2,20 @@ package com.jwliusri.library_service.security;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.jwliusri.library_service.user.UserRequest;
+import com.jwliusri.library_service.user.UserResponse;
 import com.jwliusri.library_service.user.UserService;
 import jakarta.validation.Valid;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -33,14 +38,20 @@ public class AuthController {
 
     @PostMapping("login")
     public String login(@Valid @RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getUsernameOrEmail(),
-                request.getPassword()
-            )
-        );
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return jwtUtil.generateToken(userDetails.getUsername());
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.getUsernameOrEmail(),
+                    request.getPassword()
+                )
+            );
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            return jwtUtil.generateToken(userDetails.getUsername());
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @PostMapping("register")
@@ -56,6 +67,14 @@ public class AuthController {
 
        return "Register Success";
 
+    }
+
+    @GetMapping("me")
+    public String getMe(Authentication auth) {
+        if (auth == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
+        return auth.getName();
     }
     
 }
