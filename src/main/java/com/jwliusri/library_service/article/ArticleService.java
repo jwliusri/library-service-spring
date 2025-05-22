@@ -16,7 +16,7 @@ public class ArticleService {
     }
 
     public List<ArticleResponse> getAllArticles() {
-        return articleRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        return articleRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
     public ArticleResponse getArticleById(Long id) {
@@ -34,8 +34,8 @@ public class ArticleService {
             .title(request.getTitle())
             .content(request.getContent())
             .isPublic(request.isPublic())
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
+            // .createdAt(LocalDateTime.now())
+            // .updatedAt(LocalDateTime.now())
             .build();
 
         article = articleRepository.save(article);

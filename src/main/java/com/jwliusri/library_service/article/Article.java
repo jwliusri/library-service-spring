@@ -34,6 +34,7 @@ public class Article {
     @JoinColumn(name = "author_id")
     private User author;
 
+    @Builder.Default
     private boolean isPublic = false;
 
     @CreationTimestamp

@@ -13,5 +13,5 @@ public class ArticleRequest {
     @NotBlank(message = "Content is required")
     private String content;
 
-    private boolean isPublic;
+    private boolean isPublic = false;
 }
