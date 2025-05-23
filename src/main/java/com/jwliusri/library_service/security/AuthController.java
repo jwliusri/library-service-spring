@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +50,8 @@ public class AuthController {
             return jwtUtil.generateToken(userDetails.getUsername());
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (LockedException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
             throw e;
         }

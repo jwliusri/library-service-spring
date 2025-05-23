@@ -44,6 +44,7 @@ public class User {
     @ColumnDefault("0")
     @Builder.Default
     private int failedAttempt = 0;
+    private LocalDateTime failedAttemptTime;
     private LocalDateTime lockTime;
     
     @CreationTimestamp
