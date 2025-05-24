@@ -49,12 +49,12 @@ public class WebSecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Disable CSRF
             .cors(cors -> cors.disable()) // Disable CORS (or configure if needed)
-            // .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(
                 sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers("/api/users/**").hasRole("SUPER_ADMIN")
+                .requestMatchers("/api/audit-logs/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
