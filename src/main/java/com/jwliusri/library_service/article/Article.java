@@ -1,5 +1,6 @@
 package com.jwliusri.library_service.article;
 
+import com.jwliusri.library_service.audit.AuditEntity;
 import com.jwliusri.library_service.user.User;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ import jakarta.persistence.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@AuditEntity
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

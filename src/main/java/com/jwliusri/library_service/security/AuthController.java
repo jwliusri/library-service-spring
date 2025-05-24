@@ -4,7 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.jwliusri.library_service.audit.Auditable;
+import com.jwliusri.library_service.user.User;
 import com.jwliusri.library_service.user.UserRequest;
+import com.jwliusri.library_service.user.UserResponse;
 import com.jwliusri.library_service.user.UserService;
 import jakarta.validation.Valid;
 
@@ -38,7 +41,8 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public String login(@Valid @RequestBody LoginRequest request) {
+    @Auditable(action = "USER_LOGIN", entityType = "AUTH")
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -47,7 +51,9 @@ public class AuthController {
                 )
             );
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return jwtUtil.generateToken(userDetails.getUsername());
+            User user = userService.getAuthUser(authentication);
+
+            return new LoginResponse(user.getId(), jwtUtil.generateToken(userDetails.getUsername()));
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (LockedException e) {
@@ -58,7 +64,8 @@ public class AuthController {
     }
 
     @PostMapping("register")
-    public String register(@Valid @RequestBody RegisterRequest request) {
+    @Auditable(action = "USER_REGISTER", entityType = "USER")
+    public UserResponse register(@Valid @RequestBody RegisterRequest request) {
         UserRequest userRequest = UserRequest.builder()
             .fullName(request.getFullName())
             .username(request.getUsername())
@@ -66,10 +73,7 @@ public class AuthController {
             .password(request.getPassword())
             .build();
 
-       userService.createUser(userRequest);
-
-       return "Register Success";
-
+       return userService.createUser(userRequest);
     }
 
     @GetMapping("me")

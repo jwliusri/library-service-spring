@@ -2,6 +2,8 @@ package com.jwliusri.library_service.article;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jwliusri.library_service.audit.Auditable;
+
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -39,18 +41,21 @@ public class ArticleController {
     }
 
     @PostMapping
+    @Auditable(action = "CREATE_ARTICLE", entityType = "ARTICLE")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EDITOR', 'CONTRIBUTOR')")
     public ArticleResponse createArticle(@Valid @RequestBody ArticleRequest request, Authentication auth) {
         return articleService.createArticle(request, auth);
     }
 
     @PutMapping("/{id}")
+    @Auditable(action = "UPDATE_ARTICLE", entityType = "ARTICLE")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EDITOR', 'CONTRIBUTOR')")
     public ArticleResponse updateArticle(@PathVariable Long id, @Valid @RequestBody ArticleRequest request, Authentication auth) {
         return articleService.updateArticle(id, request, auth);
     }
 
     @DeleteMapping("/{id}")
+    @Auditable(action = "DELETE_ARTICLE", entityType = "ARTICLE")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EDITOR')")
     public void deleteArticle(@PathVariable Long id, Authentication auth) {
         articleService.deleteArticle(id, auth);
