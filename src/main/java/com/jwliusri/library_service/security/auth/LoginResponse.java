@@ -1,4 +1,4 @@
-package com.jwliusri.library_service.security;
+package com.jwliusri.library_service.security.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoginResponse {
     private Long id;
-    private String token;
+    private String requestId;
 }

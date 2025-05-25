@@ -31,6 +31,11 @@ public class UserService {
         return mapToResponse(user);
     }
 
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
     public UserResponse createUser(UserRequest request) {
         User user = User.builder()
             .fullName(request.getFullName())

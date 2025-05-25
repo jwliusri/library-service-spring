@@ -15,7 +15,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.jwliusri.library_service.article.ArticleResponse;
-import com.jwliusri.library_service.security.LoginResponse;
+import com.jwliusri.library_service.security.auth.LoginResponse;
 import com.jwliusri.library_service.user.UserResponse;
 
 import jakarta.servlet.http.HttpServletRequest;

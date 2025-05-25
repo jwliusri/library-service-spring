@@ -1,4 +1,4 @@
-package com.jwliusri.library_service.security;
+package com.jwliusri.library_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+
+import com.jwliusri.library_service.security.AuthTokenFilter;
+import com.jwliusri.library_service.security.CustomAuthenticationProvider;
 
 import jakarta.servlet.DispatcherType;
 

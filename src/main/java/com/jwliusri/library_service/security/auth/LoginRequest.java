@@ -1,4 +1,4 @@
-package com.jwliusri.library_service.security;
+package com.jwliusri.library_service.security.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
