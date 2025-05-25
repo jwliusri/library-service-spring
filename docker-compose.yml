@@ -1,4 +1,21 @@
 services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/library_db
+      - SPRING_DATASOURCE_USERNAME=library_service
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_REDIS_HOST=redis
+      - SPRING_MAIL_HOST=mailhog
+    depends_on:
+      - db
+      - redis
+      - mailhog
+    networks:
+      - app-network
   db:
     image: postgres:17-alpine
     environment:
@@ -10,19 +27,23 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - db
+      - app-network
   redis:
     image: redis:8-alpine
     ports:
       - 6379:6379
+    networks:
+      - app-network
   mailhog:
     image: mailhog/mailhog
     container_name: 'mailhog'
     ports:
       - "1025:1025"
       - "8025:8025"
+    networks:
+      - app-network
 networks:
-  db:
+  app-network:
     driver: bridge
 volumes:
   postgres_data:
