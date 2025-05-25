@@ -4,6 +4,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jwliusri.library_service.audit.Auditable;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("api/articles")
+@Tag(name = "Articles", description = "Article CRUD")
+@SecurityRequirement(name = "bearerAuth")
 public class ArticleController {
 
 
@@ -31,32 +36,37 @@ public class ArticleController {
     }
 
     @GetMapping
-    public List<ArticleResponse> getAllArticles(Authentication auth) {
+    @Operation(summary = "Get all articles")
+    public List<ArticleResponseDto> getAllArticles(Authentication auth) {
         return articleService.getAllArticlesByUserAccess(auth);
     }
 
     @GetMapping("/{id}")
-    public ArticleResponse getArticleById(@PathVariable Long id, Authentication auth) {
+    @Operation(summary = "Get article by ID")
+    public ArticleResponseDto getArticleById(@PathVariable Long id, Authentication auth) {
         return articleService.getArticleById(id, auth);
     }
 
     @PostMapping
     @Auditable(action = "CREATE_ARTICLE", entityType = "ARTICLE")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EDITOR', 'CONTRIBUTOR')")
-    public ArticleResponse createArticle(@Valid @RequestBody ArticleRequest request, Authentication auth) {
+    @Operation(summary = "Create a new article")
+    public ArticleResponseDto createArticle(@Valid @RequestBody ArticleRequestDto request, Authentication auth) {
         return articleService.createArticle(request, auth);
     }
 
     @PutMapping("/{id}")
     @Auditable(action = "UPDATE_ARTICLE", entityType = "ARTICLE")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EDITOR', 'CONTRIBUTOR')")
-    public ArticleResponse updateArticle(@PathVariable Long id, @Valid @RequestBody ArticleRequest request, Authentication auth) {
+    @Operation(summary = "Update an article")
+    public ArticleResponseDto updateArticle(@PathVariable Long id, @Valid @RequestBody ArticleRequestDto request, Authentication auth) {
         return articleService.updateArticle(id, request, auth);
     }
 
     @DeleteMapping("/{id}")
     @Auditable(action = "DELETE_ARTICLE", entityType = "ARTICLE")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'EDITOR')")
+    @Operation(summary = "Delete an article")
     public void deleteArticle(@PathVariable Long id, Authentication auth) {
         articleService.deleteArticle(id, auth);
     }

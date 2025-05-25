@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserRequest {
+public class UserRequestDto {
     @NotBlank(message = "fullName is required")
     private String fullName;
     @NotBlank(message = "username is required")

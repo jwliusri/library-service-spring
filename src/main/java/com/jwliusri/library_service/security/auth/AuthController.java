@@ -8,9 +8,12 @@ import com.jwliusri.library_service.audit.Auditable;
 import com.jwliusri.library_service.security.JwtUtil;
 import com.jwliusri.library_service.security.mfa.MfaOtpService;
 import com.jwliusri.library_service.user.User;
-import com.jwliusri.library_service.user.UserRequest;
-import com.jwliusri.library_service.user.UserResponse;
+import com.jwliusri.library_service.user.UserRequestDto;
+import com.jwliusri.library_service.user.UserResponseDto;
 import com.jwliusri.library_service.user.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.security.core.Authentication;
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/auth")
+@Tag(name = "_Auth", description = "Authentication operations")
 public class AuthController {
 
     private final MfaOtpService mfaOtpService;
@@ -50,7 +54,8 @@ public class AuthController {
 
     @PostMapping("login")
     @Auditable(action = "USER_LOGIN", entityType = "AUTH")
-    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+    @Operation(summary = "Login", description = "Login with username or email, successfull login will return a MFA OTP requestId and an email is containing the OTP code is sent to the user's email.")
+    public LoginResponseDto login(@Valid @RequestBody LoginRequestDto request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -61,7 +66,7 @@ public class AuthController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userService.getAuthUser(authentication);
 
-            return new LoginResponse(user.getId(), mfaOtpService.generateOtp(userDetails.getUsername()));
+            return new LoginResponseDto(user.getId(), mfaOtpService.generateOtp(userDetails.getUsername()));
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (LockedException e) {
@@ -73,6 +78,7 @@ public class AuthController {
 
     @PostMapping("validate")
     @Auditable(action = "USER_VALIDATE", entityType = "AUTH")
+    @Operation(summary = "Validate MFA OTP ", description = "Validate MFA OTP, successfull validation will return JWT token.")
     public ValidateResponseDto validate(@Valid @RequestBody ValidateRequestDto request) {
         try {
             if (mfaOtpService.validateOtp(request.getRequestId(), request.getOtp())) {
@@ -90,8 +96,9 @@ public class AuthController {
 
     @PostMapping("register")
     @Auditable(action = "USER_REGISTER", entityType = "USER")
-    public UserResponse register(@Valid @RequestBody RegisterRequest request) {
-        UserRequest userRequest = UserRequest.builder()
+    @Operation(summary = "Register new user ")
+    public UserResponseDto register(@Valid @RequestBody RegisterRequestDto request) {
+        UserRequestDto userRequest = UserRequestDto.builder()
             .fullName(request.getFullName())
             .username(request.getUsername())
             .email(request.getEmail())
@@ -103,6 +110,7 @@ public class AuthController {
 
     @GetMapping("me")
     @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get JWT token username")
     public String getMe(Authentication auth) {
         return auth.getName();
     }

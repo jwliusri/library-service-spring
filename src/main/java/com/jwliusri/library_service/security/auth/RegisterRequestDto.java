@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class RegisterRequestDto {
     @NotBlank(message = "fullName is required")
     private String fullName;
     @NotBlank(message = "username is required")

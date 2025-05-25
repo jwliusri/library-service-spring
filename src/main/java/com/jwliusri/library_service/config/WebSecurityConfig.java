@@ -17,11 +17,20 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 import com.jwliusri.library_service.security.AuthTokenFilter;
 import com.jwliusri.library_service.security.CustomAuthenticationProvider;
 
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import static io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER;
+import static io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP;
 import jakarta.servlet.DispatcherType;
 
 @Configuration
 @EnableMethodSecurity
+@SecurityScheme(name = "bearerAuth", in = HEADER, type = HTTP, scheme = "bearer", bearerFormat = "JWT")
 public class WebSecurityConfig {
+
+    private static final String[] SWAGGER_WHITELIST = {
+        "/swagger-ui/**",
+        "api-docs/**"
+    };
 
     @Bean
     public CustomAuthenticationProvider authProvider() {
@@ -56,6 +65,7 @@ public class WebSecurityConfig {
                 sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                .requestMatchers(SWAGGER_WHITELIST).permitAll()
                 .requestMatchers("/api/users/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/api/audit-logs/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/api/auth/**").permitAll()

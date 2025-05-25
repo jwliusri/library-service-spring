@@ -20,11 +20,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UserResponse> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
-    public UserResponse getUserById(Long Id) {
+    public UserResponseDto getUserById(Long Id) {
         User user = userRepository.findById(Id)
             .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -36,7 +36,7 @@ public class UserService {
             .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    public UserResponse createUser(UserRequest request) {
+    public UserResponseDto createUser(UserRequestDto request) {
         User user = User.builder()
             .fullName(request.getFullName())
             .username(request.getUsername())
@@ -48,7 +48,7 @@ public class UserService {
         return mapToResponse(user);
     }
 
-    public UserResponse updateUser(Long id, UserRequest request) {
+    public UserResponseDto updateUser(Long id, UserRequestDto request) {
         User user = userRepository.findById(id)
             .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -79,8 +79,8 @@ public class UserService {
             .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    private UserResponse mapToResponse(User user) {
-        return new UserResponse(
+    private UserResponseDto mapToResponse(User user) {
+        return new UserResponseDto(
             user.getId(),
             user.getFullName(),
             user.getUsername(),

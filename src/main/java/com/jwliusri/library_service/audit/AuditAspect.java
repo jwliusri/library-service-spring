@@ -14,9 +14,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.jwliusri.library_service.article.ArticleResponse;
-import com.jwliusri.library_service.security.auth.LoginResponse;
-import com.jwliusri.library_service.user.UserResponse;
+import com.jwliusri.library_service.article.ArticleResponseDto;
+import com.jwliusri.library_service.security.auth.LoginResponseDto;
+import com.jwliusri.library_service.security.auth.ValidateResponseDto;
+import com.jwliusri.library_service.user.UserResponseDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -68,14 +69,17 @@ public class AuditAspect {
 
     private Optional<Long> extractEntityId(JoinPoint joinPoint, Auditable auditable, Object result) {
         // First try to get ID from result if it's a response DTO
-        if (result != null && result instanceof ArticleResponse) {
-            return Optional.of(((ArticleResponse) result).getId());
+        if (result != null && result instanceof ArticleResponseDto) {
+            return Optional.of(((ArticleResponseDto) result).getId());
         }
-        if (result != null && result instanceof UserResponse) {
-            return Optional.of(((UserResponse) result).getId());
+        if (result != null && result instanceof UserResponseDto) {
+            return Optional.of(((UserResponseDto) result).getId());
         }
-        if (result != null && result instanceof LoginResponse) {
-            return Optional.of(((LoginResponse) result).getId());
+        if (result != null && result instanceof LoginResponseDto) {
+            return Optional.of(((LoginResponseDto) result).getId());
+        }
+        if (result != null && result instanceof ValidateResponseDto) {
+            return Optional.of(((ValidateResponseDto) result).getId());
         }
 
         // Then try to get from method arguments

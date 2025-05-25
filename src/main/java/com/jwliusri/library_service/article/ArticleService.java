@@ -25,20 +25,20 @@ public class ArticleService {
         this.userService = userService;
     }
 
-    public List<ArticleResponse> getAllArticles() {
+    public List<ArticleResponseDto> getAllArticles() {
         return articleRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
-    public List<ArticleResponse> getAllPublicOrOwnedArticles(User authUser) {
+    public List<ArticleResponseDto> getAllPublicOrOwnedArticles(User authUser) {
         return articleRepository.findAllPublicOrAuthored(authUser.getId()).stream().map(this::mapToResponse).toList();
     }
 
-    public List<ArticleResponse> getAllPublicOrOwnedArticles(Authentication auth) {
+    public List<ArticleResponseDto> getAllPublicOrOwnedArticles(Authentication auth) {
         User authUser = userService.getAuthUser(auth);
         return getAllPublicOrOwnedArticles(authUser);
     }
 
-    public List<ArticleResponse> getAllArticlesByUserAccess(Authentication auth) {
+    public List<ArticleResponseDto> getAllArticlesByUserAccess(Authentication auth) {
         User authUser = userService.getAuthUser(auth);
 
         Set<RoleEnum> limitedRoles = Set.of(RoleEnum.ROLE_VIEWER, RoleEnum.ROLE_CONTRIBUTOR); 
@@ -49,7 +49,7 @@ public class ArticleService {
         return getAllArticles();
     }
 
-    public ArticleResponse getArticleById(Long id, Authentication auth) {
+    public ArticleResponseDto getArticleById(Long id, Authentication auth) {
         User authUser = userService.getAuthUser(auth);
         Article article = articleRepository.findById(id)
             .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found"));
@@ -63,7 +63,7 @@ public class ArticleService {
 
     }
 
-    public ArticleResponse createArticle(ArticleRequest request, Authentication auth) {
+    public ArticleResponseDto createArticle(ArticleRequestDto request, Authentication auth) {
         User author = userService.getAuthUser(auth);
 
         Article article = Article.builder()
@@ -77,7 +77,7 @@ public class ArticleService {
         return mapToResponse(article);
     }
 
-    public ArticleResponse updateArticle(Long id, ArticleRequest request, Authentication auth) {
+    public ArticleResponseDto updateArticle(Long id, ArticleRequestDto request, Authentication auth) {
         User authUser = userService.getAuthUser(auth);
         Article article = articleRepository.findById(id)
             .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found"));
@@ -109,8 +109,8 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
-    private ArticleResponse mapToResponse(Article article) {
-        return new ArticleResponse(
+    private ArticleResponseDto mapToResponse(Article article) {
+        return new ArticleResponseDto(
             article.getId(),
             article.getTitle(),
             article.getContent(),
