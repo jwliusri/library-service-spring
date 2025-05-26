@@ -1,9 +1,9 @@
 package com.jwliusri.library_service.security;
 import com.jwliusri.library_service.user.UserRepository;
 
+
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +16,11 @@ import com.jwliusri.library_service.user.User;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
@@ -30,5 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 List.of((GrantedAuthority)new SimpleGrantedAuthority(user.getRole().toString()))
         );
     }
+
+    
     
 }

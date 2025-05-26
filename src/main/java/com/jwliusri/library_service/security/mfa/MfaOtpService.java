@@ -34,10 +34,10 @@ public class MfaOtpService {
         String requestId = UUID.randomUUID().toString();
 
         MfaOtp mfaOtp = new MfaOtp(requestId, username, otp);
-        mfaOtpRepository.save(mfaOtp);
+        mfaOtp = mfaOtpRepository.save(mfaOtp);
         
         // send email
-        emailService.sendSimpleMail(new EmailDetail(user.getEmail(), "OTP: "+otp, "Library Service OTP"));
+        emailService.sendSimpleMail(new EmailDetail(user.getEmail(), "OTP: "+mfaOtp.getOtp(), "Library Service OTP"));
 
         return requestId;
     }

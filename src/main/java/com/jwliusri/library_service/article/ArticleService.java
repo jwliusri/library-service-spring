@@ -109,7 +109,7 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
-    private ArticleResponseDto mapToResponse(Article article) {
+    public ArticleResponseDto mapToResponse(Article article) {
         return new ArticleResponseDto(
             article.getId(),
             article.getTitle(),

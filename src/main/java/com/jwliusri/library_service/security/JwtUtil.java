@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtParserBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 
 @Component
@@ -44,7 +46,7 @@ public class JwtUtil {
     }
     // Get username from JWT token
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder()
+        return getParserBuilder()
                 .setSigningKey(key).build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -53,7 +55,7 @@ public class JwtUtil {
     // Validate JWT token
     public boolean validateJwtToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            getParserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException e) {
             System.out.println("Invalid JWT signature: " + e.getMessage());
@@ -65,8 +67,15 @@ public class JwtUtil {
             System.out.println("JWT token is unsupported: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             System.out.println("JWT claims string is empty: " + e.getMessage());
+        } catch (SignatureException e) {
+            System.out.println("JWT claims string is empty: " + e.getMessage());
+
         }
         return false;
+    }
+
+    public JwtParserBuilder getParserBuilder() {
+        return Jwts.parserBuilder();
     }
 
 }

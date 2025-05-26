@@ -67,7 +67,7 @@ public class AuditAspect {
         auditLogRepository.save(log);
     }
 
-    private Optional<Long> extractEntityId(JoinPoint joinPoint, Auditable auditable, Object result) {
+    public Optional<Long> extractEntityId(JoinPoint joinPoint, Auditable auditable, Object result) {
         // First try to get ID from result if it's a response DTO
         if (result != null && result instanceof ArticleResponseDto) {
             return Optional.of(((ArticleResponseDto) result).getId());
@@ -100,7 +100,7 @@ public class AuditAspect {
                 });
     }
 
-    private String getCurrentUsername() {
+    public String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return "ANONYMOUS";

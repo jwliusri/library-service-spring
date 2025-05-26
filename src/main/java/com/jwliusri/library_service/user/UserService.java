@@ -79,7 +79,7 @@ public class UserService {
             .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    private UserResponseDto mapToResponse(User user) {
+    public UserResponseDto mapToResponse(User user) {
         return new UserResponseDto(
             user.getId(),
             user.getFullName(),
